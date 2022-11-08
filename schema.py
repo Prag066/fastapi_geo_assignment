@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from typing import List
 
 class AddressBookBase(BaseModel):
-    Lat: int
-    Lon: int
+    Lat: float
+    Lon: float
     Place: str
     ZipCode: str
     updated_date = datetime

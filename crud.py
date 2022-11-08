@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from model import Base, AddressBook
 import schema,re
 from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
 
 geolocator = Nominatim(user_agent="crudapitest")
 def create_address(db: Session, address: schema.AddressCreate):
@@ -14,6 +15,7 @@ def create_address(db: Session, address: schema.AddressCreate):
     # print("postal_code",postal_code)
     address.Lat = data['lat']
     address.Lon = data['lon']
+    address.ZipCode = loc_data[-2].strip(',')
     # address.ZipCode = address.ZipCode if  address.ZipCode is not None else loc_data[-2]
     obj = AddressBook(**address.dict())
     db.add(obj)
@@ -26,8 +28,19 @@ def get_all_address(db: Session):
 def get_address(db: Session, aid):
     return db.query(AddressBook).filter(AddressBook.id == aid).first()
 
-def get_address_by_location(db: Session, zipcode):
-    return db.query(AddressBook).filter(AddressBook.ZipCode == zipcode).first()
+def get_address_by_location(db: Session, distance, lat, lon):
+    # distannce_in_km = geodesic(lat, lon).km
+    get_ids = []
+    query = db.query(AddressBook).all()
+    for i in query:
+        # print("id",i.id,i.Lat,i.Lon)
+        # query = db.query(AddressBook).filter(AddressBook.Lat==i.Lat,AddressBook.Lon==i.Lon)
+        distannce_in_km = geodesic((i.Lat, i.Lon),(lat,lon)).km
+        # print("finalll",i.id,i.Lat,i.Lon,distance,distannce_in_km,distance >= distannce_in_km)
+        if distance >= distannce_in_km:
+            get_ids.append(i.id)
+    print("get_ids",get_ids)
+    return list(db.query(AddressBook).filter(AddressBook.id.in_(get_ids)))
 
 def update_address(db: Session, aid, address: schema.AddressCreate):
     obj = db.query(AddressBook).filter(AddressBook.id == aid).first()

@@ -20,6 +20,10 @@ def get_db():
 def get_address(db: Session = Depends(get_db)):
     return crud.get_all_address(db=db)
 
+@app.get("/address_list_by_location/", response_model=List[schema.AddressBook])
+def get_address_by_location(distance: float,lat: float, lon: float, db: Session = Depends(get_db)):
+    return crud.get_address_by_location(distance=distance,lat=lat, lon=lon, db=db)
+
 @app.post("/address_create/", response_model=schema.AddressInfo)
 def create_address(address: schema.AddressCreate, db: Session = Depends(get_db)):
     return crud.create_address(db=db, address=address)
