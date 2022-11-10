@@ -50,5 +50,5 @@ Application endpoints details
 -> get the address id and pass to the aid parameter to delete the address from addressbook
 
 Note: 
-1. aid refres address id which get be get from address_list endpoint
+1. aid refers address id which get be get from address_list endpoint
 2. This Application also using Logging on request and it is stored in the fastapi.log file.
